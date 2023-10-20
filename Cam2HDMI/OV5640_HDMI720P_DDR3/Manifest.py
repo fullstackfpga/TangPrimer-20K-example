@@ -10,6 +10,7 @@ syn_grade = "C8/I7"
 syn_package = "PG256"
 syn_top = "top"
 syn_project = "cam2hdmi"
+syn_properties = [{'use_sspi_as_gpio' : '1'}]
 syn_tool = "gowin"
 
 modules = {"local" :

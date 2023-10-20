@@ -6,7 +6,7 @@
 TOP_MODULE := top
 PROJECT := camlcd
 PROJECT_FILE := $(PROJECT).
-TOOL_PATH := /opt/eda-tools/gowin/v198_11/IDE/bin
+TOOL_PATH := /opt/eda-tools/gowin/v199_beta_5/IDE/bin
 TCL_INTERPRETER := gw_sh 
 ifneq ($(strip $(TOOL_PATH)),)
 TCL_INTERPRETER := $(TOOL_PATH)/$(TCL_INTERPRETER)
@@ -19,6 +19,9 @@ SYN_DEVICE := 18
 SYN_DEVICE_VERSION := C
 SYN_PACKAGE := PG256
 SYN_GRADE := C8/I7
+SYN_PROPERTIES := set_option -use_sspi_as_gpio 1 
+
+INCLUDE_DIRS :=
 
 ifneq ($(wildcard $(PROJECT_FILE)),)
 TCL_CREATE := $(TCL_OPEN)
@@ -27,23 +30,23 @@ endif
 #target for performing local synthesis
 all: bitstream
 
+SOURCES_VerilogFile += src/video_frame_buffer/Video_Frame_Buffer_Top.v 
+SOURCES_VerilogFile += src/i2c_master/timescale.v 
+SOURCES_VerilogFile += src/i2c_master/i2c_master_bit_ctrl.v 
+SOURCES_VerilogFile += src/i2c_master/i2c_master_top.v 
+SOURCES_VerilogFile += src/i2c_master/i2c_master_byte_ctrl.v 
+SOURCES_VerilogFile += src/lut_ov5640_rgb565_480_272.v 
+SOURCES_VerilogFile += src/i2c_master/i2c_config.v 
 SOURCES_VerilogFile += src/gowin_rpll/cmos_pll.v 
 SOURCES_VerilogFile += src/syn_gen.v 
-SOURCES_VerilogFile += src/i2c_master/i2c_master_byte_ctrl.v 
-SOURCES_VerilogFile += src/top.v 
-SOURCES_VerilogFile += src/i2c_master/timescale.v 
-SOURCES_VerilogFile += src/video_frame_buffer/Video_Frame_Buffer_Top.v 
-SOURCES_VerilogFile += src/i2c_master/i2c_master_defines.v 
-SOURCES_VerilogFile += src/i2c_master/i2c_config.v 
-SOURCES_VerilogFile += src/ddr3_memory_interface/DDR3MI.v 
-SOURCES_VerilogFile += src/gowin_rpll/mem_pll.v 
-SOURCES_VerilogFile += src/gowin_rpll/sys_pll.v 
-SOURCES_VerilogFile += src/fifo_hs/video_fifo.v 
 SOURCES_VerilogFile += src/cmos_8_16bit.v 
+SOURCES_VerilogFile += src/i2c_master/i2c_master_defines.v 
+SOURCES_VerilogFile += src/gowin_rpll/sys_pll.v 
+SOURCES_VerilogFile += src/ddr3_memory_interface/DDR3MI.v 
 SOURCES_VerilogFile += src/testpattern.v 
-SOURCES_VerilogFile += src/i2c_master/i2c_master_bit_ctrl.v 
-SOURCES_VerilogFile += src/lut_ov5640_rgb565_480_272.v 
-SOURCES_VerilogFile += src/i2c_master/i2c_master_top.v
+SOURCES_VerilogFile += src/fifo_hs/video_fifo.v 
+SOURCES_VerilogFile += src/top.v 
+SOURCES_VerilogFile += src/gowin_rpll/mem_pll.v
 
 SOURCES_SDCFile += src/lcd.sdc
 
@@ -59,10 +62,13 @@ SYN_POST_BITSTREAM_CMD :=
 
 bitstream.tcl:
 		echo source files.tcl >> $@
-		echo set_device -device_version                                   $(SYN_DEVICE_VERSION)                                   $(SYN_FAMILY)$(SYN_FAMILY_SURFIX)-$(SYN_DEVICE_PREFIX)$(SYN_DEVICE)$(SYN_PACKAGE)$(SYN_GRADE) >> $@
+		echo set_device -device_version $(SYN_DEVICE_VERSION)                                   $(SYN_FAMILY)$(SYN_FAMILY_SURFIX)-$(SYN_DEVICE_PREFIX)$(SYN_DEVICE)$(SYN_PACKAGE)$(SYN_GRADE) >> $@
 		echo set_option -output_base_name $(PROJECT)_proj >> $@
 		echo set_option -top_module $(TOP_MODULE) >> $@
-		echo set_option -use_sspi_as_gpio 1 >> $@
+		echo $(SYN_PROPERTIES) >> $@
+		echo set_option -use_mspi_as_gpio 1 >> $@
+		echo set_option -use_ready_as_gpio 1 >> $@
+		echo set_option -use_done_as_gpio 1 >> $@
 		echo run syn >> $@
 		echo run pnr >> $@
 

@@ -6,7 +6,7 @@
 TOP_MODULE := top
 PROJECT := ws2812
 PROJECT_FILE := $(PROJECT).
-TOOL_PATH := /opt/eda-tools/gowin/v198_11/IDE/bin
+TOOL_PATH := /opt/eda-tools/gowin/v199_beta_1/IDE/bin
 TCL_INTERPRETER := gw_sh 
 ifneq ($(strip $(TOOL_PATH)),)
 TCL_INTERPRETER := $(TOOL_PATH)/$(TCL_INTERPRETER)
@@ -19,6 +19,8 @@ SYN_DEVICE := 18
 SYN_DEVICE_VERSION := C
 SYN_PACKAGE := PG256
 SYN_GRADE := C8/I7
+
+INCLUDE_DIRS :=
 
 ifneq ($(wildcard $(PROJECT_FILE)),)
 TCL_CREATE := $(TCL_OPEN)
@@ -40,10 +42,13 @@ SYN_POST_BITSTREAM_CMD :=
 
 bitstream.tcl:
 		echo source files.tcl >> $@
-		echo set_device -device_version                                   $(SYN_DEVICE_VERSION)                                   $(SYN_FAMILY)$(SYN_FAMILY_SURFIX)-$(SYN_DEVICE_PREFIX)$(SYN_DEVICE)$(SYN_PACKAGE)$(SYN_GRADE) >> $@
+		echo set_device -device_version $(SYN_DEVICE_VERSION)                                   $(SYN_FAMILY)$(SYN_FAMILY_SURFIX)-$(SYN_DEVICE_PREFIX)$(SYN_DEVICE)$(SYN_PACKAGE)$(SYN_GRADE) >> $@
 		echo set_option -output_base_name $(PROJECT)_proj >> $@
 		echo set_option -top_module $(TOP_MODULE) >> $@
 		echo set_option -use_sspi_as_gpio 1 >> $@
+		echo set_option -use_mspi_as_gpio 1 >> $@
+		echo set_option -use_ready_as_gpio 1 >> $@
+		echo set_option -use_done_as_gpio 1 >> $@
 		echo run syn >> $@
 		echo run pnr >> $@
 
